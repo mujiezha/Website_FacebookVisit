@@ -1,0 +1,73 @@
+.Postblock{
+  padding: 15px;
+  margin: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.Postimage{
+  margin-right: 15px;
+}
+
+.Postname{
+  margin-top: 10px;
+}
+
+.Postinfo{
+  vertical-align: middle;
+}
+
+#FBtable,#Favtable,#DETAILtable{
+    margin: 20px 20px 20px 20px;
+}
+
+#FBtable,#Favtable{
+    overflow:auto;
+    overflow-x:scroll;
+    white-space:nowrap;
+}
+
+th{
+    min-width: 20px; 
+    overflow:auto;
+    overflow-x:scroll;
+    white-space:nowrap;  
+}
+
+#LongSpace{
+    min-width: 100px;
+}
+
+#menuBar{
+    border-bottom: 2px solid #3b5998;
+}
+
+#menuBar>li>a{
+  color:black;
+  border:none;
+}
+
+#menuBar>li>a:hover{
+  background-color:white;
+  border-radius:0px;
+}
+
+#menuBar>li.active>a:hover,
+#menuBar>li.active>a:focus,
+#menuBar>li.active>a{
+  background-color:#3b5998;
+  color:white;
+  border-radius:0px;
+}
+
+#Wholemenu{
+    margin: 0;
+    padding: 15px;
+}
+
+.input-group,.roundbutton{
+   border-radius:0px; 
+}
+
+
+

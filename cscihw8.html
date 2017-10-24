@@ -1,0 +1,242 @@
+<html>
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>hw8</title>
+    <!-- Bootstrap core CSS -->
+    <!-- Latest compiled and minified CSS and animate CSS--->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    
+    <!--include angular-->     
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular-animate.min.js"></script>
+    <!--include my js file-->
+    <script type="text/javascript" src="./cscihw8.js"></script>
+    <link rel="stylesheet" href="cscihw8.css">
+    <!---include moment--->
+   <!-- reference Moment.js library -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.7.0/moment.min.js" type="text/javascript"></script>
+    
+    <!--include facebook SDK-->     
+    <script>
+       window.fbAsyncInit = function() {
+        //SDK loaded, initialize it
+        FB.init({
+            appId:'1011201082313379',
+            xfbml:true,
+            version:'v2.6'
+        });
+       };
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+    </script>   
+  </head>
+    
+    
+<body>
+<div ng-app="headerapp" ng-controller="headerCtrl">
+ 
+<!-- this part is for the page header -->
+<div class="navbar navbar-default" id="Wholemenu">
+      <div class="col-xs-12 col-md-3" >
+          <h4 class="navbar-text" style="color:#3b5998;">FB Search</h4>
+      </div>
+    <form>
+    <div class="col-xs-8 col-md-5">    
+      <div class="input-group" style="margin:10px;" >
+                <input class="form-control roundbutton" placeholder="type something..." ng-model="searchinput" ng-bind="searchinput" type="text" required>
+                <div class="input-group-btn">
+                <button class="btn btn-default roundbutton " type="submit" ng-click="Search()" style="background-color:#3b5998;">&nbsp;<span class="glyphicon glyphicon-search" style="color:white"></span></button>
+                </div>
+      </div>  
+    </div>   
+    <div class="col-xs-4 col-md-2">
+     <button class="btn btn-default roundbutton" type="button" aria-label=hide ng-click="Clear()" style="margin:10px; border-color:#3b5998;color:#3b5998;" >Clear</button>
+    </div>
+    </form>
+</div>    
+<!--end of the page header -->
+      
+<!--nav bar -->      
+<ul class="nav nav-tabs nav-justified row" id="menuBar">
+  <li role="presentation" class={{usersactive}} ng-click="UsersFunc()"><a href="#">Users</a></li>
+  <li role="presentation" class={{pagesactive}} ng-click="PagesFunc()"><a href="#">Pages</a></li>
+  <li role="presentation" class={{eventsactive}} ng-click="EventsFunc()"><a href="#">Events</a></li>
+  <li role="presentation" class={{placesactive}} ng-click="PlacesFunc()"><a href="#">Places</a></li>
+  <li role="presentation" class={{groupsactive}} ng-click="GroupsFunc()"><a href="#">Groups</a></li>
+  <li role="presentation" class={{favoritesactive}} ng-click="FavoritesFunc(true)"><a href="#">Favorites</a></li>
+</ul>
+<!--the end of the nav bar --> 
+<!--program bar--->   
+    <div style="padding:0% 15% 0% 15%; margin-top:15%" ng-show='showFBbar'>
+    <div class="progress" >
+      <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100%" style="width: 50%">
+        <span class="sr-only">50% Complete</span>
+      </div>
+    </div>
+    </div>
+<!------->
+<!--the content -->
+<div id='main-content'>
+    <!--this is the user table-->
+    <div id='FBtable' ng-show='showFB' ng-init="showFB=false" style="align:center">
+        
+    <div ng-show='!hasData(tbcontent.data)&&(!isClear)'>NO DATA FOUND</div>    
+    <table class="table table-hover col-xs-12" ng-show='hasData(tbcontent.data)' ng-class="{'animated slideInRight':slideBack}">
+    <thead>
+       <tr>
+           <th class="col-md-1">#</th>
+           <th class="col-md-2.5">Profile Photo</th>
+           <th class="col-md-4.5" id="LongSpace">Name</th>
+           <th class="col-md-2">favorite</th>
+           <th class="col-md-2">Details</th>
+       </tr>
+    </thead>
+    <tbody>
+       <tr ng-repeat='x in tbcontent.data'>
+           <th scope="row">{{$index + 1}}</th>
+           <td><a href={{x.picture.data.url}} target="_blank"><img src={{x.picture.data.url}} class="img-circle"  height="30" width="30"></a></td>
+           <td>{{x.name}}</td>
+           <td><button class="btn btn-default" type="button" aria-label=hide ng-click="ChangeStar(x,false);">
+               <span ng-class="{'glyphicon glyphicon-star':DecideStar(x.id),'glyphicon glyphicon-star-empty':!DecideStar(x.id)}" ng-style="{'color': DecideStar(x.id)? 'yellow':'black'}">
+               </span>
+               </button>
+           </td>
+           <td><button class="btn btn-default" type="button" aria-label=hide ng-click="Detailcall(x)"><span class="glyphicon glyphicon-chevron-right" ></span></button></td>
+       </tr>
+    </tbody>
+    </table>
+     
+    <div class="row">
+    <div class="col-xs-12 col-md-12" style="text-align:center;"> 
+    <button class="btn btn-default" type="button"  ng-click="UserPre(tbcontent.paging.previous)" ng-if="ShowPageButton(tbcontent.paging.previous)" style="margin-right:20px">Previous</button>
+    <button class="btn btn-default " type="button" ng-click="UserNext(tbcontent.paging.next)" ng-if="ShowPageButton(tbcontent.paging.next)">Next</button>
+    </div>
+    </div> 
+        
+   </div>
+    
+    <!--this is the detail table-->
+    
+    <div id='DETAILtable' ng-show='showdetail' class="animated slideInLeft" >
+     
+    <div class="row"> 
+    <div class="col-xs-12 col-md-12">
+    <div class="pull-left" style="display:inline-block">    
+    <button class="btn btn-default" type="button" aria-label=hide ng-click="DetailBack()"><span class="glyphicon glyphicon-menu-left" >Back</span></button>
+    </div>
+    <div class="pull-right";style="display:inline-block">    
+    <button class="btn btn-default" type="button" aria-label=hide ng-click="ChangeStar(detailitem,false)" style="margin-right:20px"><span ng-class="{'glyphicon glyphicon-star':DecideStar(detailitem.id),'glyphicon glyphicon-star-empty':!DecideStar(detailitem.id)}" ng-style="{'color': DecideStar(detailitem.id)? 'yellow':'black'}"></span></button>
+    <button class="btn btn-default" ng-click="PostFBstatus(detailitem)" style="padding:5 10 5 10" ><input type="image" src="facebook.png" style="height:15px; width:15px"/></button>
+    </div>
+    </div>
+    </div>    
+        
+    <div class="row " style="margin-top:20px;" >
+    <!--this is the albums table--> 
+    <div class="col-sm-6">
+    <div class="panel panel-default">
+    <div class="panel-heading">Albums</div>
+    <div class="panel-body">
+    <!--program bar--->
+    <div class="progress" ng-show='showDT'>
+      <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+        <span class="sr-only">45% Complete</span>
+      </div>
+    </div>
+    <!------->
+       <div class="alert alert-warning" role="alert" ng-show='noAlbum && (!showDT)'>No data found</div>
+       <div class="panel panel-default" ng-repeat='dx in detailjson.albums.data' ng-show='!noAlbum'>
+           <div ng-if="hasData(dx.photos.data)">
+            <div class="panel-heading" style="background-color:#f5f5f5"><a style="color:#333" ng-click="ChangeShow($index)">{{dx.name}}</a></div>
+            <div class="panel-body" ng-show="CanShow($index)" ng-class="{'animated slideInUp':CanShow($index) }">
+                <div ng-repeat='i in dx.photos.data' style="margin:5px 5px 10px 5px" >
+                    <a href='https://graph.facebook.com/v2.8/{{i.id}}/picture?access_token=EAAOXrplOyqMBADSJC4RfJMVhp02mhPhNZCJZA7tqMikyeXJtnF79aeeiFeoLbIAYvne7EfTSsolZAmD4NHb0pnIVOdtcwq6yHiPUukhISW8p7P91M7pzJ8DCb2s4ZAFcaFIJaMjZBShidlDAd8sAZBgjy6fC74dZBoZD' target="_blank"><img src='https://graph.facebook.com/v2.8/{{i.id}}/picture?access_token=EAAOXrplOyqMBADSJC4RfJMVhp02mhPhNZCJZA7tqMikyeXJtnF79aeeiFeoLbIAYvne7EfTSsolZAmD4NHb0pnIVOdtcwq6yHiPUukhISW8p7P91M7pzJ8DCb2s4ZAFcaFIJaMjZBShidlDAd8sAZBgjy6fC74dZBoZD' style="width:100%" ></a>
+                </div>
+            </div>
+           </div>
+           <div ng-if="!hasData(dx.photos.data)">
+            <div class="panel-heading">{{dx.name}}</div>
+           </div>
+       </div>
+    </div>
+    </div>
+    </div>
+     
+    <div class="col-sm-6">
+    <!--this is the post table-->
+    <div class="panel panel-default" >
+    <div class="panel-heading">Posts</div>
+    <div class="panel-body">
+    <!--program bar--->
+    <div class="progress" ng-show='showDT'>
+      <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+        <span class="sr-only">45% Complete</span>
+      </div>
+    </div>
+    <!------->    
+       <div class="alert alert-warning" role="alert" ng-show='noPosts && (!showDT) '>No data found</div>
+       <div ng-repeat='px in detailjson.posts.data' class="Postblock" ng-show='!noPosts'>
+           <div class="Postimage" style="display:inline-block"><img src={{detailjson.picture.data.url}} class="img-rounded"  height="50" width="50"></div>
+           <div class="Postinfo" style="display:inline-block" >
+                <h5>{{detailjson.name}}</h5>
+                <p>{{px.created_time | date:'yyyy-MM-dd HH:mm:ss'}}</p>
+           </div>
+           <div class="Postinfo"><p>{{px.message}}</p></div>
+       </div>
+    </div>
+    </div>
+    </div>
+    <!--the end of the row -->    
+    </div>
+    <!--the end of the detail table -->       
+    </div>
+    
+    <!--this is the Favorite table-->
+    <div ng-show="showfavor" id="Favtable">
+    <div ng-show='!hasData(favorlist)'>NO Favorite Yet! Add Something :p</div>    
+        <table class="table table-hover col-xs-12" ng-show='hasData(favorlist)'ng-class="{'animated slideInRight':slideBack}">
+        <thead>
+        <tr>
+           <th class="col-md-1">#</th>
+           <th class="col-md-3">Profile Photo</th>
+           <th class="col-md-3">Name</th>
+           <th class="col-md-2">Type</th>
+           <th class="col-md-2">favorite</th>
+           <th class="col-md-1">Details</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat='x in favorlist'>
+           <th scope="row">{{$index + 1}}</th>
+           <td><img src={{x.picture}} class="img-circle"  height="30" width="30"></td>
+           <td>{{x.name}}</td>
+           <td>{{x.type}}</td>
+           <td><button class="btn btn-default" type="button" aria-label=hide ng-click="ChangeStar(x,true)"><span class="glyphicon glyphicon-trash"></span></button></td>
+           <td><button class="btn btn-default" type="button" aria-label=hide ng-click="Detailcall(x)"><span class="glyphicon glyphicon-chevron-right" ></span></button></td>
+        </tr>
+        </tbody>
+        </table>
+    </div>
+    <!----the end fo the Favorite table--->
+</div>
+<!--the end of the main-content-->
+    
+</div>
+</body>
+</html>
